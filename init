@@ -1,0 +1,62 @@
+#!/bin/sh
+
+SKIP_OSX=0
+SKIP_HOMEBREW=0
+
+for arg in $@; do
+    case $arg in
+        --skip-osx)
+        SKIP_OSX=1
+        shift
+        ;;
+        --skip-homebrew)
+        SKIP_HOMEBREW=1
+        shift
+        ;;
+        *)
+        # unknown option
+        ;;
+    esac
+    shift # past argument or value
+done
+
+echo "Initialising FT new developer";
+
+echo "Updating sudo timestamp";
+
+sudo -v;
+
+# Keep-alive: update existing `sudo` time stamp until `.osx` has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+. ./cmd/homebrew;
+. ./cmd/google_groups;
+. ./cmd/osx;
+. ./cmd/ssh_keygen;
+
+echo "Install Xcode CLI";
+
+xcode-select --install;
+
+if [ $SKIP_OSX -ne 1 ]; then
+    update_osx_settings;
+else
+    echo "Skip update OSX settings";
+fi
+
+check_and_generate_ssh_keys;
+
+install_homebrew;
+
+if [ $SKIP_HOMEBREW -ne 1 ]; then
+    install_homebrew_defaults
+
+    install_homebrew_default_casks
+else
+    echo "Skip installing homebrew defaults";
+fi
+
+join_google_group "next.team";
+
+join_google_group "next.feedback";
+

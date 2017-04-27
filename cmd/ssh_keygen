@@ -1,0 +1,74 @@
+#!/bin/sh
+
+check_and_generate_ssh_keys() {
+
+    echo ""
+    echo "If you do not have a github account, please got to github.com and create one before continuing."
+    echo ""
+    echo "Press enter to continue:"
+
+    read CONTINUE_INSTALL
+
+    if [ -e ~/.ssh/id_rsa ]; then
+
+        echo "SSH key already exists";
+
+        check_can_access_github
+
+    else
+        echo "Generating new SSH Key"
+
+        echo "Please enter your email address:"
+
+        read EMAIL_ADDRESS
+
+        ssh-keygen -t rsa -b 4096 -C "$EMAIL_ADDRESS"
+
+        echo "Starting SSH AGENT"
+
+        eval "$(ssh-agent -s)"
+
+        echo "Create ~/.ssh/config"
+
+        cat >> ~/.ssh/config << SSH_CONFIG
+Host *
+ AddKeysToAgent yes
+ UseKeychain yes
+ IdentityFile ~/.ssh/id_rsa
+SSH_CONFIG
+
+        chmod 0600 ~/.ssh/config
+
+        echo "Create ~/.ssh/id_rsa to ssh-agent"
+
+        ssh-add -K ~/.ssh/id_rsa
+
+        check_can_access_github
+    fi
+
+}
+
+check_can_access_github() {
+    ssh -T git@github.com
+
+    if [[ $? -eq 1 ]]; then
+
+        echo "You already have Github access! :D";
+
+    else
+
+        echo "follow the instructions on entering your SSH Key into github:"
+
+        open "https://help.github.com/enterprise/2.9/user/articles/adding-a-new-ssh-key-to-your-github-account/"
+
+        echo "https://help.github.com/enterprise/2.9/user/articles/adding-a-new-ssh-key-to-your-github-account/"
+
+        # double open as the first one doesn't seem to work....? :^S
+        open "https://help.github.com/enterprise/2.9/user/articles/adding-a-new-ssh-key-to-your-github-account/"
+
+        echo "Press enter to continue once you have finished."
+
+        read CONTINUE_INSTALL
+
+    fi
+}

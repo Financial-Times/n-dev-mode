@@ -1,0 +1,73 @@
+#!/bin/sh
+
+install_homebrew() {
+
+    if [ -x "$(which brew)" ]; then
+
+        echo "Homebrew is already installed";
+
+    else
+
+        echo "Installing Homebrew";
+
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+    fi;
+
+}
+
+install_homebrew_defaults() {
+	# Install GNU core utilities (those that come with OS X are outdated)
+	brew install coreutils
+
+	# Install GNU `find`, `locate`, `updatedb`, and `xargs`, g-prefixed
+	brew install findutils
+
+	# Install Bash 4
+	brew install bash
+
+	# Install wget with IRI support
+	brew install wget --with-iri
+
+	# Install more recent versions of some OS X tools
+	brew tap homebrew/dupes
+	brew install homebrew/dupes/grep
+
+	# Install everything else
+	brew install ack
+	brew install git
+	brew install rename
+	brew install tree
+	brew install grep
+	brew install git
+	brew install git-extras
+	brew install go
+	brew install python
+	brew install awscli
+#	brew install postgresql
+	brew install neo4j
+#	brew install kafka
+#	brew install docker
+#	brew install docker-machine
+#	brew install docker-compose
+#	brew install docker-swarm
+#	brew install jpeg
+#	brew install jpegoptim
+#	brew install libpng
+	brew install voltdb
+	brew install xz
+#	brew install imagemagick
+#	brew install graphicsmagick
+#	brew install ffmpeg
+
+	brew reinstall --with-pcre git
+}
+
+
+install_homebrew_default_casks() {
+	brew cask install alfred
+	brew cask install iterm2
+	brew cask install java
+    brew cask install slack;
+	brew cask install virtualbox
+}

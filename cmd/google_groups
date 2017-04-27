@@ -1,0 +1,7 @@
+#!/bin/sh
+
+join_google_group() {
+
+    echo "Requesting permission to join the \`$1\` google group";
+
+}
