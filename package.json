@@ -1,0 +1,30 @@
+{
+  "name": "@financial-times/n-dev-mode",
+  "version": "0.0.1",
+  "description": "new developer light weight all purpose fire proof do-hickey helper start script thingy ",
+  "dependencies": {},
+  "devDependencies": {
+    "@financial-times/secret-squirrel": "^2.0.1",
+    "pre-git": "^3.14.0"
+  },
+  "scripts": {
+    "commit": "commit-wizard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/constantology/n-dev-mode.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/constantology/n-dev-mode/issues"
+  },
+  "homepage": "https://github.com/constantology/n-dev-mode#readme",
+  "config": {
+    "pre-git": {
+      "pre-commit": [
+        "node_modules/.bin/secret-squirrel"
+      ]
+    }
+  }
+}
