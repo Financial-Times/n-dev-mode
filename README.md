@@ -6,5 +6,6 @@
 
 ### options
 
-`--skip-osx` - skip updating OSX internal settings, see [cmds/osx] for more info.
-`--skip-homebrew` - skip installing homebrew default programs and casks, see [cmds/homebrew] for more info.
+`--skip-osx` - skip updating OSX internal settings, see [cmds/osx](cmds/osx) for more info.
+
+`--skip-homebrew` - skip installing homebrew default programs and casks, see [cmds/homebrew](cmds/homebrew) for more info.
