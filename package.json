@@ -19,12 +19,5 @@
   "bugs": {
     "url": "https://github.com/constantology/n-dev-mode/issues"
   },
-  "homepage": "https://github.com/constantology/n-dev-mode#readme",
-  "config": {
-    "pre-git": {
-      "pre-commit": [
-        "node_modules/.bin/secret-squirrel"
-      ]
-    }
-  }
+  "homepage": "https://github.com/constantology/n-dev-mode#readme"
 }
