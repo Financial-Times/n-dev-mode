@@ -1,0 +1,75 @@
+#!/bin/sh
+
+sudo -v;
+
+# Keep-alive: update existing `sudo` time stamp until `.osx` has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+FT_HOME=`pwd`;
+
+FT_GITHUB='git clone git@github.com:Financial-Times';
+FT_GITHUB_EXT='git';
+
+PROJECTS=(kat-client-proxies kat-footer kat-myft-syncher kat-usage-report kmt-api kmt-header kmt-licence-sync kmt-myft kmt-overview kmt-utilities)
+
+add_repos() {
+    for project in "${PROJECTS[@]}"; do
+        if [[ ! -d "./$project" ]]; then
+            echo "adding $project:";
+
+            git clone "$FT_GITHUB/$project.$FT_GITHUB_EXT";
+        else
+            echo "$project already exists, skipping.";
+        fi
+    done;
+}
+
+setup_projects() {
+    for project in "${PROJECTS[@]}"; do
+        cd "$FT_HOME/$project";
+
+        if [[ -f "n.Makefile" ]]; then
+            if [[ -f Makefile ]]; then
+                make .env;
+
+                make install;
+
+                make build;
+            fi
+        fi
+
+        cd "$FT_HOME";
+    done;
+}
+
+update_hosts() {
+    if [[ -z "$(sudo grep -e 'local\.ft\.com' /etc/hosts)" ]]; then
+        echo "adding local.ft.com"
+
+        sudo -- sh -c "echo '127.0.0.1	local.ft.com' >> /etc/hosts"
+    else
+        echo "/etc/hosts already contains: local.ft.com"
+    fi
+
+    if [[ -z "$(sudo grep -e 'local\.kat\.ft\.com' /etc/hosts)" ]]; then
+        echo "adding local.kat.ft.com"
+
+        sudo -- sh -c "echo '127.0.0.1	local.kat.ft.com' >> /etc/hosts"
+    else
+        echo "/etc/hosts already contains: local.kat.ft.com"
+    fi
+
+    if [[ -z "$(sudo grep -e 'local\.next-kat\.ft\.com' /etc/hosts)" ]]; then
+        echo "adding local.next-kat.ft.com"
+
+        sudo -- sh -c "echo '127.0.0.1	local.next-kat.ft.com' >> /etc/hosts"
+    else
+        echo "/etc/hosts already contains: local.next-kat.ft.com"
+    fi
+}
+
+update_hosts;
+
+add_repos;
+
+setup_projects;
