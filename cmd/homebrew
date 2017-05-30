@@ -80,20 +80,26 @@ install_homebrew_defaults() {
 install_homebrew_default_casks() {
     # uncomment what you want to install
 
+### Bringing command line like power to your GUI.
 #    brew cask install alfred
 #    brew cask install atom
     brew cask install google-chrome
+### easily update to the latest version of Java
     brew cask install java
 #    brew cask install spotify
 #    brew cask install android-file-transfer
 #    brew cask install google-drive
+### adds markdown rendering to your Finder's QuickLook: https://github.com/toland/qlmarkdown
+    brew cask install qlmarkdown
     brew cask install postman
 #    brew cask install sublime-text
 #    brew cask install firefox
     brew cask install google-hangouts
 #    brew cask install skype
     brew cask install virtualbox
+### installs the `Adobe Source Code Pro` font: specifically designed for developers/IDEs
     brew cask install font-source-code-pro
+### Better `Terminal`, allows for multiple panes per Tab/Window and a bunch of other nice customisations
     brew cask install iterm2
     brew cask install slack
 #    brew cask install webstorm
