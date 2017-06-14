@@ -96,6 +96,7 @@ install_homebrew_default_casks() {
 #    brew cask install firefox
     brew cask install google-hangouts
 #    brew cask install skype
+    brew cask install vault
     brew cask install virtualbox
 ### installs the `Adobe Source Code Pro` font: specifically designed for developers/IDEs
     brew cask install font-source-code-pro
