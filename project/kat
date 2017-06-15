@@ -28,6 +28,12 @@ add_repos() {
             git clone "$FT_GITHUB/$project.$FT_GITHUB_EXT";
         else
             echo "$project already exists, skipping.";
+
+            cd "$project";
+
+            git pull origin "$(git rev-parse --abrev-ref HEAD)";
+
+            cd ..;
         fi
     done;
 }
