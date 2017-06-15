@@ -2,6 +2,8 @@
 
 set -e;
 
+heroku login --sso;
+
 sudo -v;
 
 # Keep-alive: update existing `sudo` time stamp until `.osx` has finished
