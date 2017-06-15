@@ -42,6 +42,8 @@ setup_projects() {
         cd "$FT_HOME/$project";
 
         if [[ -f Makefile ]]; then
+            rm -rf .env;
+
             make .env;
 
             make install;
