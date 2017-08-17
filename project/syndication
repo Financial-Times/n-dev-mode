@@ -1,0 +1,155 @@
+#!/bin/sh
+
+#set -e;
+
+heroku login --sso;
+
+sudo -v;
+
+# Keep-alive: update existing `sudo` time stamp until `.osx` has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+FT_HOME=`pwd`;
+
+FT_GITHUB='git@github.com:Financial-Times';
+FT_GITHUB_EXT='git';
+
+PROJECTS=(next-service-registry next-router next-front-page n-syn-footer n-syn-header n-syndication next-syn-contract next-syn-list next-syndication-api next-syndication-db-schema next-syndication-dl)
+
+LOCAL_APP_DIR_PREFIX="next";
+LOCAL_APP_NAME_PREFIX="ft-next";
+LOCAL_APPS=(front-page syn-list syn-contract syndication-api syndication-dl);
+
+add_repos() {
+    for project in "${PROJECTS[@]}"; do
+        if [[ ! -d "./$project" ]]; then
+            echo "adding $project:";
+
+            git clone "$FT_GITHUB/$project.$FT_GITHUB_EXT";
+        else
+            echo "$project already exists, skipping.";
+
+            cd "$project";
+
+            git pull origin "$(git rev-parse --abbrev-ref HEAD)";
+
+            cd ..;
+        fi
+    done;
+}
+
+get_port_number() {
+    PORT=`grep -E "^PORT=[0-9]{4}" "$FT_HOME/$1/.env"`;
+    IFS="=" read -ra PORT_NUMBER <<< "$PORT";
+
+    echo "${PORT_NUMBER[1]}";
+}
+
+setup_db() {
+    cd "$FT_HOME/next-syndication-db-schema";
+
+    if [[ ! -f .env ]]; then
+        echo "DATABASE_NAME=syndication" >> .env
+        echo "DATABASE_HOST=192.168.99.100" >> .env
+        echo "DATABASE_PORT=5432" >> .env
+        echo "DATABASE_USER_NAME=ft_syndication" >> .env
+    fi
+
+    make import-clean;
+}
+
+setup_projects() {
+    for project in "${PROJECTS[@]}"; do
+        cd "$FT_HOME/$project";
+
+        if [[ -f Makefile ]]; then
+            if [[ -f .env ]]; then
+                mv .env ".env-$(date '+%Y-%m-%dT%H:%M:%S')";
+            fi
+
+            make .env || echo "No .env file needed";
+
+            make install;
+
+            make build;
+        fi
+
+        cd "$FT_HOME";
+    done;
+}
+
+setup_router() {
+    cd "$FT_HOME/next-router";
+
+    echo "" >> .env;
+    echo "PORT=5050" >> .env;
+    echo "" >> .env;
+
+    for local_app in "${LOCAL_APPS[@]}"; do
+        port="$(get_port_number $LOCAL_APP_DIR_PREFIX-$local_app)";
+
+        if [[ -z `grep -E "^$local_app=[0-9]{4}" "$FT_HOME/next-router/.env"` ]]; then
+            echo "adding $local_app=$port to .env";
+
+            echo "$local_app=$port"  >> .env;
+        else
+            echo "$local_app already exists in .env";
+        fi;
+
+    done;
+
+    cd "$FT_HOME";
+}
+
+update_hosts() {
+    if [[ -z "$(sudo grep -E 'local\.ft\.com' /etc/hosts)" ]]; then
+        echo "adding local.ft.com"
+
+        sudo -- sh -c "echo '127.0.0.1	local.ft.com' >> /etc/hosts"
+    else
+        echo "/etc/hosts already contains: local.ft.com"
+    fi
+}
+
+switch_db() {
+    DB_APPS=(n-syndication next-syn-list next-syn-contract next-syndication-api);
+
+    for app in "${DB_APPS[@]}"; do
+        cd "$FT_HOME/$app";
+
+        git checkout switch_db;
+
+        make install;
+
+        make build;
+    done;
+
+    cd "$FT_HOME/n-syndication";
+
+    bower link;
+
+    cd "$FT_HOME/next-front-page";
+
+    bower link n-syndication;
+
+    if [[ -z `grep -E "^NEXT_APP_SHELL=local" "$FT_HOME/next-front-page/.env"` ]]; then
+        echo ""  >> .env;
+        echo "NEXT_APP_SHELL=local"  >> .env;
+    fi
+
+    make build;
+
+    cd "$FT_HOME";
+}
+
+update_hosts;
+
+add_repos;
+
+setup_projects;
+
+setup_router;
+
+setup_db;
+
+switch_db;
