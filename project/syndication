@@ -45,6 +45,25 @@ get_port_number() {
     echo "${PORT_NUMBER[1]}";
 }
 
+link_stuff() {
+    cd "$FT_HOME/n-syndication";
+
+    bower link;
+
+    cd "$FT_HOME/next-front-page";
+
+    bower link n-syndication;
+
+    if [[ -z `grep -E "^NEXT_APP_SHELL=local" "$FT_HOME/next-front-page/.env"` ]]; then
+        echo ""  >> .env;
+        echo "NEXT_APP_SHELL=local"  >> .env;
+    fi
+
+    make build;
+
+    cd "$FT_HOME";
+}
+
 setup_db() {
     cd "$FT_HOME/next-syndication-db-schema";
 
@@ -111,37 +130,6 @@ update_hosts() {
     fi
 }
 
-switch_db() {
-    DB_APPS=(n-syndication next-syn-list next-syn-contract next-syndication-api);
-
-    for app in "${DB_APPS[@]}"; do
-        cd "$FT_HOME/$app";
-
-        git checkout switch_db;
-
-        make install;
-
-        make build;
-    done;
-
-    cd "$FT_HOME/n-syndication";
-
-    bower link;
-
-    cd "$FT_HOME/next-front-page";
-
-    bower link n-syndication;
-
-    if [[ -z `grep -E "^NEXT_APP_SHELL=local" "$FT_HOME/next-front-page/.env"` ]]; then
-        echo ""  >> .env;
-        echo "NEXT_APP_SHELL=local"  >> .env;
-    fi
-
-    make build;
-
-    cd "$FT_HOME";
-}
-
 update_hosts;
 
 add_repos;
@@ -152,4 +140,4 @@ setup_router;
 
 setup_db;
 
-switch_db;
+link_stuff;
