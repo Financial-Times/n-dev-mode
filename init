@@ -56,7 +56,7 @@ else
     echo "Skip installing homebrew defaults";
 fi
 
-join_google_group "next.team";
+#join_google_group "next.team";
 
-join_google_group "next.feedback";
+#join_google_group "next.feedback";
 
